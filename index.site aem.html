@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A&M Produções - Produtora Audiovisual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS from original site */
+        @keyframes word-appear {
+            0% { opacity: 0; transform: translateY(30px) scale(0.8); filter: blur(10px); }
+            50% { opacity: 0.8; transform: translateY(10px) scale(0.95); filter: blur(2px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        
+        .word-animate {
+            display: inline-block;
+            opacity: 0;
+            margin: 0 0.1em;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .word-animate:hover {
+            color: #cbd5e1;
+            transform: translateY(-2px);
+        }
+        
+        .ripple-effect {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(203, 213, 225, 0.6);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: pulse-glow 1s ease-out forwards;
+            z-index: 9999;
+        }
+        
+        /* ... Outros estilos de animação (grid-draw, pulse-glow, float, toast) ... */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.1); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+            25% { transform: translateY(-10px) translateX(5px); opacity: 0.6; }
+            50% { transform: translateY(-5px) translateX(-3px); opacity: 0.4; }
+            75% { transform: translateY(-15px) translateX(7px); opacity: 0.8; }
+        }
+        @keyframes marquee {
+             from { transform: translateX(0); }
+             to { transform: translateX(calc(-100% - var(--gap))); }
+       }
+        
+        .animate-marquee {
+             animation: marquee var(--duration) linear infinite;
+       }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+             width: 8px;
+       }
+        
+        ::-webkit-scrollbar-track {
+             background: #1e293b;
+       }
+        
+        ::-webkit-scrollbar-thumb {
+             background: #475569;
+             border-radius: 4px;
+       }
+        
+        ::-webkit-scrollbar-thumb:hover {
+             background: #64748b;
+       }
+
+        /* Testimonials Scroll Animation */
+        @keyframes scroll {
+             0% { transform: translateY(0); }
+             100% { transform: translateY(-50%); }
+        }
+
+        .animate-scroll {
+             animation: scroll linear infinite;
+        }
+        .mask-overflow {
+             mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+             -webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+        }
+        /* --- FIM DOS ESTILOS NÃO RELACIONADOS À GALERIA/MODAL --- */
+        
+
+        /* --- CÓDIGO CSS DO BOTÃO WHATSAPP --- */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25D366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 24px;
+            }
+        }
+        /* --- FIM DO CÓDIGO CSS DO BOTÃO WHATSAPP --- */
+
+
+        /* ======================================= */
+        /* === NOVOS ESTILOS PARA GALERIA E MODAL === */
+        /* ======================================= */
+
+        /* Estilo base para a carta de vídeo (Grid) */
+        .video-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); 
+            width: 100%;
+        }
+        
+        .video-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Todos os vídeos da galeria agora terão o mesmo aspect-ratio 16/9 */
+        .video-card[data-ratio="16/9"] {
+            aspect-ratio: 16/9;
+        }
+        
+        /* Vídeo dentro do card */
+        .video-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Garante que o vídeo preencha o espaço sem barras pretas no loop */
+            display: block;
+        }
+        
+        /* Contêiner do Modal (Lightbox) */
+        #videoModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        #videoModal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Fundo desfocado e escuro */
+        #modalBackdrop {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* Suporte a navegadores WebKit */
+        }
+
+        /* Contêiner do Vídeo no Modal */
+        #modalContent {
+            position: relative;
+            z-index: 10001;
+            max-width: 90%;
+            max-height: 90%;
+            width: auto;
+            height: auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+            transform: scale(0.9); /* Efeito de expansão inicial */
+        }
+
+        #videoModal.open #modalContent {
+             transform: scale(1);
+        }
+
+        /* Estilo do vídeo expandido (para respeitar o aspect ratio) */
+        #modalVideo {
+            display: block;
+            object-fit: contain; /* Garante que o vídeo caiba perfeitamente */
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Aspect Ratio - Horizontal (Padrão para a maioria dos vídeos) */
+        #modalContent.ratio-16-9 {
+            aspect-ratio: 16/9;
+            width: 80vw; /* Tenta usar 80% da largura da tela */
+            max-width: 1200px; /* Limite máximo */
+        }
+
+        /* Aspect Ratio - Vertical (ainda mantemos para o modal, caso algum vídeo seja realmente 9/16 e não queiramos cortá-lo no modal) */
+        #modalContent.ratio-9-16 {
+            aspect-ratio: 9/16;
+            height: 80vh; /* Tenta usar 80% da altura da tela */
+            max-height: 900px; /* Limite máximo */
+        }
+
+        /* Botão de Fechar */
+        #closeModal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10002;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        #closeModal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Estilo para gradiente que segue o mouse */
+        #mouse-gradient-react {
+            position: fixed;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            border-radius: 50%;
+            z-index: 5; 
+        }
+        
+        /* ======================================= */
+        /* === ESTILOS PARA MODAL DE AGENDAMENTO === */
+        /* ======================================= */
+        
+        #scheduleModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10100; /* Z-index mais alto que o modal de vídeo */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        #scheduleModal.hidden {
+            display: none;
+        }
+        
+        #scheduleModal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Fundo desfocado e escuro para Agendamento */
+        #scheduleBackdrop {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Contêiner do Agendamento no Modal */
+        #scheduleContent {
+            position: relative;
+            z-index: 10101;
+            max-width: 95%;
+            max-height: 95%;
+            width: 1000px; /* Largura padrão para desktop */
+            height: 80vh; /* Altura padrão */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            background-color: #fff; /* Fundo branco para o iframe de agendamento */
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+        
+        @media (max-width: 1024px) {
+            #scheduleContent {
+                width: 95vw;
+                height: 95vh;
+            }
+        }
+
+        #scheduleModal.open #scheduleContent {
+             transform: scale(1);
+        }
+        
+        #scheduleIframe {
+             display: block;
+        }
+        
+        /* Botão de Fechar para Agendamento - Posicionado sobre o backdrop */
+        #closeSchedule {
+             position: absolute;
+             top: 15px;
+             right: 15px;
+             z-index: 10102;
+             background: rgba(0, 0, 0, 0.5); 
+             color: white;
+             border: 2px solid rgba(255, 255, 255, 0.4);
+             border-radius: 50%;
+             width: 40px;
+             height: 40px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             cursor: pointer;
+             transition: background 0.3s, transform 0.2s;
+        }
+
+        #closeSchedule:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans overflow-x-hidden">
+    
+    <!-- ONDE O LOGO E LINKS DE NAVEGAÇÃO SÃO DINAMIZADOS -->
+    <nav id="mainNav" class="fixed w-full z-50 bg-black/50 backdrop-blur-md transition-all duration-300">
+        <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <a href="#home" id="navLogoLink" class="flex items-center">
+                <!-- LOGO DINÂMICA --><img id="navLogo" src="https://res.cloudinary.com/dkjc5y76w/image/upload/v1761668741/3_f9cu8v_1_cibmar.png" alt="A&M Produções" class="h-12">
+            </a>
+            
+            <!-- Menu de navegação ajustado para compactação e ícones -->
+            <div id="main-menu" class="hidden md:flex flex-col md:flex-row items-center md:space-x-6 lg:space-x-4 absolute md:relative top-full left-0 w-full md:w-auto bg-black/80 md:bg-transparent p-4 md:p-0">
+                <!-- LINKS DINÂMICOS SERÃO INJETADOS AQUI -->
+            </div>
+
+            <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ONDE O CONTEÚDO DA HOME É DINAMIZADO -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <div class="absolute inset-0 bg-black/50 z-10"></div>
+        <!-- VÍDEO PRINCIPAL DINÂMICO --><video id="homeVideo" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover">
+            <source id="homeVideoSource" src="" type="video/mp4">
+        </video>
+        
+        <div class="container mx-auto px-4 sm:px-6 relative z-20 text-center">
+            <h1 id="homeTitle" class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-slide-up" style="animation-delay: 0.2s;">
+                <!-- O TÍTULO DINÂMICO ENTRA AQUI -->
+                <span class="word-animate" data-delay="200">A&M</span>
+                <span class="word-animate" data-delay="400">Produções</span>
+            </h1>
+            <p id="homeSubtitle" class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-3xl mx-auto animate-slide-up" style="animation-delay: 0.4s;">
+                <!-- O SUBTÍTULO DINÂMICO ENTRA AQUI -->
+                <span class="word-animate" data-delay="600">Criando</span>
+                <span class="word-animate" data-delay="800">experiências</span>
+                <span class="word-animate" data-delay="1000">audiovisuais</span>
+                <span class="word-animate" data-delay="1200">que</span>
+                <span class="word-animate" data-delay="1400">inspiram</span>
+            </p>
+            <!-- BOTÕES NA HOME ATUALIZADOS -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4 animate-slide-up" style="animation-delay: 0.6s;">
+                <!-- Botão Agendar Horário (Link Dinâmico) --><a id="scheduleButton" href="#" onclick="openScheduleModal(GLOBAL_CONFIG.schedule_url); return false;" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-semibold transition duration-300">
+                    Agendar Horário
+                </a>
+                <a href="#contact" class="bg-transparent border border-white hover:bg-white/10 text-white px-8 py-3 rounded-full font-semibold transition duration-300">
+                    Solicitar Orçamento
+                </a>
+                <a href="#videoPlayerMain" class="bg-transparent border border-white hover:bg-white/10 text-white px-8 py-3 rounded-full font-semibold transition duration-300">
+                    Ver Portfólio
+                </a>
+            </div>
+        </div>
+        
+        <!-- Elementos flutuantes de detalhe --><div class="floating-element-animate" style="top: 25%; left: 15%; animation-delay: 0.5s"></div>
+        <div class="floating-element-animate" style="top: 60%; left: 85%; animation-delay: 1s"></div>
+        <div class="floating-element-animate" style="top: 40%; left: 10%; animation-delay: 1.5s"></div>
+        <div class="floating-element-animate" style="top: 75%; left: 90%; animation-delay: 2s"></div>
+        
+        <!-- Gradiente de rastreamento do mouse (Efeito visual) --><div id="mouse-gradient-react" class="w-60 h-60 blur-xl sm:w-80 sm:h-80 sm:blur-2xl md:w-96 md:h-96 md:blur-3xl"></div>
+    </section>
+
+    <!-- ONDE A SEÇÃO CLIENTES É DINAMIZADA -->
+    <section id="clients" class="py-12 bg-gray-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h2 id="clientsTitle" class="text-2xl md:text-3xl font-bold text-center mb-8">Nossos Clientes</h2>
+            
+             <div id="clientsMarqueeContainer" class="relative overflow-hidden">
+                <!-- O MARQUEE SERÁ INJETADO AQUI DINAMICAMENTE -->
+                <p class="text-center text-gray-500">Carregando logos dos clientes...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ONDE A SEÇÃO SOBRE NÓS É DINAMIZADA -->
+    <section id="about" class="py-16 sm:py-20 bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 animate-fade-in">
+                    <h2 id="aboutTitle" class="text-3xl sm:text-4xl font-bold mb-6">Sobre Nós</h2>
+                    <p id="aboutP1" class="text-lg md:text-xl mb-6 text-gray-300">
+                        A A&M Produções é uma produtora audiovisual especializada em criar conteúdo de alta qualidade que conta histórias e engaja audiências.
+                    </p>
+                    <p id="aboutP2" class="text-lg md:text-xl mb-8 text-gray-300">
+                        Com uma equipe de profissionais experientes e apaixonados, combinamos criatividade e tecnologia para produzir vídeos que destacam sua marca e mensagem.
+                    </p>
+                    
+                    <!-- Lista de bullets de serviços fixos (pode ser mantida estática ou removida) -->
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>Filmagem profissional</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>Edição de vídeo</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>Vídeos Institucionais</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>Produção de eventos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 relative animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="aspect-w-16 aspect-h-9 bg-gray-800 rounded-xl overflow-hidden">
+                        <!-- IMAGEM DESTAQUE DINÂMICA --><img id="aboutImage" src="https://res.cloudinary.com/dkjc5y76w/image/upload/v1761666149/aem_disgner_02_sbeocc.png" alt="Equipe da A&M Produções filmando com equipamento profissional" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <div class="absolute -bottom-6 -right-6 bg-blue-600 p-4 rounded-lg shadow-lg hidden md:block">
+                        <p class="text-white font-bold">Excelência e Rapidez</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ONDE A SEÇÃO PORTFÓLIO É DINAMIZADA -->
+    <section id="portfolio" class="py-16 sm:py-20 bg-black">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-12 text-center">Portfólio</h2>
+        </div>
+
+        <!-- Vídeo Principal (Player nativo com controles mínimos) -->
+        <div class="mb-8 main-player-container">
+            <div class="container mx-auto px-4 sm:px-6">
+                 <div style="position:relative;width:100%;padding-top:56.25%;background:#000;overflow:hidden;border-radius:12px;">
+                    <video
+                      id="videoPlayerMain"
+                      playsinline
+                      muted
+                      loop
+                      controls
+                      style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:0;border-radius:12px;"
+                    >
+                      <!-- SOURCE DINÂMICA --><source id="videoPlayerMainSource" src="" type="video/mp4">
+                      Seu navegador não suporta o vídeo HTML5.
+                    </video>
+                 </div>
+            </div>
+        </div>
+        
+        <!-- Texto amigável abaixo do vídeo principal -->
+        <div class="container mx-auto px-4 sm:px-6 mb-16 text-center">
+             <p class="text-xl text-gray-400 italic font-light mb-8">
+                 Você terá uma experiência nova ao clicar no botão abaixo para verificar todo o nosso portfólio.
+             </p>
+             <button onclick="openExperienceModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95">
+                 <i class="fas fa-play-circle mr-2"></i> Acessar Portfólio Completo
+             </button>
+        </div>
+
+
+        <!-- Seção de projetos adicionais removida conforme solicitado -->
+    </section>
+
+    <!-- ONDE A SEÇÃO SERVIÇOS É DINAMIZADA -->
+    <section id="services" class="py-16 sm:py-20 bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Nossos Serviços</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Explore nosso universo de produções audiovisuais, criadas para impactar e contar a sua história.</p>
+            </div>
+            
+            <div id="servicesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+                <!-- CARDS DE SERVIÇO DINÂMICOS SERÃO INJETADOS AQUI -->
+                <p class="text-center text-gray-500 col-span-full">Carregando serviços...</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ONDE A SEÇÃO DEPOIMENTOS É DINAMIZADA -->
+    <section id="testimonials" class="py-16 sm:py-20 bg-gray-800">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-purple-900/30 opacity-30"></div>
+        <div class="container mx-auto px-4 sm:px-6 relative z-10">
+            <div class="flex flex-col items-center justify-center max-w-2xl mx-auto text-center mb-16">
+                <span class="inline-block border border-blue-700 bg-blue-900/50 text-blue-300 py-1 px-4 rounded-lg text-sm font-medium mb-4">
+                    Depoimentos
+                </span>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
+                    O que nossos clientes dizem
+                </h2>
+                <p class="text-gray-300 text-lg">
+                    Veja o que nossos clientes têm a dizer sobre nós.
+                </p>
+            </div>
+    
+            <!-- Carrossel de Depoimentos com Animação de Rolagem Vertical (Marquee) -->
+            <div id="testimonialsCarousel" class="flex justify-center gap-6 mask-overflow max-h-[740px] overflow-hidden">
+                <!-- COLUNAS DE DEPOIMENTOS DINÂMICAS SERÃO INJETADAS AQUI -->
+                <p class="text-center text-gray-500">Carregando depoimentos...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ONDE A SEÇÃO CONTATO/ORÇAMENTO É DINAMIZADA -->
+    <section id="contact" class="py-16 sm:py-20 bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-12 text-center">Solicite um Orçamento</h2>
+                
+                <form id="budget-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <h3 class="text-xl font-semibold mb-4">Informações Pessoais</h3>
+                    </div>
+                    
+                    <div>
+                        <label for="name" class="block mb-2">Nome completo</label>
+                        <input type="text" id="name" name="name" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block mb-2">E-mail</label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block mb-2">Telefone</label>
+                        <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="company" class="block mb-2">Empresa (opcional)</label>
+                        <input type="text" id="company" name="company" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <h3 class="text-xl font-semibold mb-4">Detalhes do Projeto</h3>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label for="service" class="block mb-2">Tipo de Serviço</label>
+                        <!-- SELECT DE SERVIÇOS DINÂMICO --><select id="service" name="service" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <!-- Opções dinâmicas injetadas via JS -->
+                            <option value="">Carregando serviços...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label for="date" class="block mb-2">Data prevista para o projeto (opcional)</label>
+                        <input type="date" id="date" name="date" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label for="message" class="block mb-2">Detalhes e observações</label>
+                        <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    
+                    <div class="md:col-span-2 flex justify-center">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold transition duration-300">
+                            Enviar Solicitação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ONDE O RODAPÉ É DINAMIZADO -->
+    <footer id="mainFooter" class="bg-black py-12">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-8 md:mb-0 text-center md:text-left">
+                    <!-- LOGO DINÂMICA --><img id="footerLogo" src="https://res.cloudinary.com/dkjc5y76w/image/upload/v1761668741/3_f9cu8v_1_cibmar.png" alt="A&M Produções" class="h-16 mx-auto md:mx-0">
+                    <p class="text-gray-400 mt-4">Criando experiências audiovisuais que inspiram.</p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Links</h3>
+                        <ul id="footerNav" class="space-y-2">
+                            <!-- LINKS DE NAVEGAÇÃO DINÂMICOS -->
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Serviços</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#services" class="text-gray-400 hover:text-white transition">Filmagem</a></li>
+                            <li><a href="#services" class="text-gray-400 hover:text-white transition">Edição</a></li>
+                            <li><a href="#services" class="text-gray-400 hover:text-white transition">Vídeos Institucionais</a></li>
+                            <li><a href="#services" class="text-gray-400 hover:text-white transition">Eventos</a></li>
+                            <li><a href="#services" class="text-gray-400 hover:text-white transition">Comerciais</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div id="footerContact">
+                        <h3 class="text-lg font-semibold mb-4">Contato</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-phone-alt text-gray-400 mr-2"></i>
+                                <span id="footerWhatsappNumber" class="text-gray-400">(19) 99325-2814</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-envelope text-gray-400 mr-2"></i>
+                                <span id="footerEmail" class="text-gray-400">aem.producoes.visuais@gmail.com</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
+                                <span class="text-gray-400">Campinas, SP</span>
+                            </li>
+                        </ul>
+                        
+                        <!-- Ícones de Mídia Social -->
+                        <div class="flex gap-4 mt-4">
+                            <a href="https://www.facebook.com/profile.php?id=61564873724977" class="text-gray-400 hover:text-white transition" target="_blank" aria-label="Facebook da A&M Produções">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://www.instagram.com/aem.producoes/" class="text-gray-400 hover:text-white transition" target="_blank" aria-label="Instagram da A&M Produções">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+
+                            <a href="https://www.linkedin.com/company/aem-produ%C3%A7%C3%B5es?trk=public_profile_topcard-current-company" class="text-gray-400 hover:text-white transition" target="_blank" aria-label="LinkedIn da A&M Produções">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-center md:text-left mb-4 md:mb-0">© 2023 A&M Produções. Todos os direitos reservados.</p>
+                
+                <div class="flex gap-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition">Termos de Serviço</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">Política de Privacidade</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Botão Flutuante do WhatsApp (Link Dinâmico) --><a id="whatsappFloatButton" href="https://wa.me/5519993252814?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco pelo WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    
+    <!-- Contêiner para notificações de Toast --><div class="notificationContainer"></div> 
+
+    <!-- ======================================= --><!-- === MODAL/LIGHTBOX PARA VÍDEO EXPANDIDO === --><!-- ======================================= --><div id="videoModal">
+        <div id="modalBackdrop" onclick="closeModal()"></div>
+        <div id="modalContent">
+            <!-- O elemento de vídeo será injetado aqui pelo JavaScript -->
+        </div>
+        <!-- Botão de Fechar movido para fora do modalContent para evitar a remoção acidental --><button id="closeModal" onclick="closeModal()" aria-label="Fechar Vídeo">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <!-- ======================================= -->
+    <!-- === MODAL/LIGHTBOX PARA AGENDAMENTO === -->
+    <!-- ======================================= -->
+    <div id="scheduleModal" class="hidden">
+        <div id="scheduleBackdrop" onclick="closeScheduleModal()"></div>
+        <div id="scheduleContent">
+            <iframe id="scheduleIframe" src="" frameborder="0" class="w-full h-full"></iframe>
+        </div>
+        <!-- Botão de Fechar do agendamento, posicionado sobre o modal -->
+        <button id="closeSchedule" onclick="closeScheduleModal()" aria-label="Fechar Agendamento">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- MODAL DE EXPERIÊNCIA PORTFÓLIO EXTERNO -->
+    <div id="experienceModal" class="hidden fixed inset-0 z-[10200] flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-xl" onclick="closeExperienceModal()"></div>
+        <div class="relative z-[10201] w-[95vw] h-[90vh] bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex flex-col">
+            <!-- Barra Superior do Modal para não obstruir o conteúdo -->
+            <div class="w-full bg-gray-900/90 backdrop-blur-md p-3 flex justify-between items-center border-b border-white/10 z-[10202]">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2">Portfólio Interativo</span>
+                <div class="flex gap-3">
+                    <a href="https://stream-aem.vercel.app/" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-xs font-bold">
+                        <i class="fas fa-external-link-alt"></i> <span>Abrir Externamente</span>
+                    </a>
+                    <button onclick="closeExperienceModal()" class="bg-white/10 hover:bg-white/20 text-white w-8 h-8 rounded-lg flex items-center justify-center transition border border-white/20">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <iframe id="experienceIframe" src="" class="w-full flex-grow border-0"></iframe>
+        </div>
+    </div>
+    
+    <!-- Firebase SDKs e Lógica de Dinamização (Para Carregamento Rápido) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            onSnapshot,
+            query
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- VARIÁVEIS GLOBAIS DE DADOS ---
+        const appId = 'siteaem-fe7e0'; 
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5qkr1vtxz_4rka_bmdG9c2cbQO4-nSGA",
+            authDomain: "siteaem-fe7e0.firebaseapp.com",
+            projectId: "siteaem-fe7e0",
+            storageBucket: "siteaem-fe7e0.firebasestorage.app",
+            messagingSenderId: "51920285815",
+            appId: "1:51920285815:web:0a9312855df048e5ea79672"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let GLOBAL_CONFIG = {}; // Armazena as configs globais
+        
+        const PUBLIC_PATH = `artifacts/${appId}/public/data/`;
+        
+        // Mapeamento das coleções
+        const collections = {
+            config: doc(db, PUBLIC_PATH + 'config/global'),
+            about: doc(db, PUBLIC_PATH + 'config/about'),
+            services: collection(db, PUBLIC_PATH + 'services'),
+            portfolio: collection(db, PUBLIC_PATH + 'portfolio'),
+            testimonials: collection(db, PUBLIC_PATH + 'testimonials'),
+            clients: collection(db, PUBLIC_PATH + 'clients')
+        };
+        
+        // --- FUNÇÕES DE UTILITY DE UI (TOAST NOTIFICATIONS) ---
+        function createNotification(type, title, content) {
+            const notificationContainer = document.querySelector('.notificationContainer');
+            if (!notificationContainer) return;
+
+            const notif = document.createElement('div');
+            // Simplificado para cores Tailwind
+            const bgColor = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
+            const iconSvg = type === 'success' ? `<i class="fas fa-check-circle text-2xl"></i>` : `<i class="fas fa-info-circle text-2xl"></i>`;
+            
+            notif.className = `${bgColor} text-white p-4 rounded-lg shadow-xl mb-4 transition transform ease-out duration-300 opacity-0 translate-x-full fixed bottom-5 right-5 z-[100000]`;
+            notif.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    ${iconSvg}
+                    <div>
+                        <h3 class="font-bold text-lg">${title}</h3>
+                        <p class="text-sm">${content}</p>
+                    </div>
+                </div>
+            `;
+            
+            notificationContainer.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.classList.remove('opacity-0', 'translate-x-full');
+            }, 10);
+
+            setTimeout(() => {
+                notif.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => notif.remove(), 300);
+            }, 4000);
+        }
+
+        // --- 1. FUNÇÕES DE RENDERIZAÇÃO ---
+        
+        const linkMap = {
+            'home': { text: 'Home', icon: 'fas fa-home', isIcon: true, target: '#home' },
+            'about': { text: 'Sobre Nós', icon: null, isIcon: false, target: '#about' },
+            'portfolio': { text: 'Portfólio', icon: null, isIcon: false, target: '#videoPlayerMain' },
+            'services': { text: 'Serviços', icon: null, isIcon: false, target: '#services' },
+            'testimonials': { text: 'Depoimentos', icon: 'fas fa-comments', isIcon: true, target: '#testimonials' },
+            'contact': { text: 'Orçamento', icon: null, isIcon: false, target: '#contact' },
+            'schedule': { text: 'Agendamento', icon: 'fas fa-calendar-alt', isIcon: true, target: '#', isSpecial: true },
+        };
+        
+        function renderNavigation() {
+            const navMenu = document.getElementById('main-menu');
+            if (!navMenu) return;
+            
+            let html = '';
+            const menuOrder = ['home', 'about', 'portfolio', 'services', 'testimonials', 'contact'];
+
+            // 1. Renderiza links de navegação baseados na visibilidade
+            menuOrder.forEach(id => {
+                const configKey = `is_${id}_active`;
+                const linkData = linkMap[id];
+                
+                // Home é sempre assumida visível para navegação principal
+                const isActive = (id === 'home' || GLOBAL_CONFIG[configKey] !== false);
+                
+                if (isActive) {
+                    if (linkData.isIcon) {
+                        // Link com ícone (Home, Depoimentos)
+                        html += `
+                            <a href="${linkData.target}" class="block text-white hover:text-blue-400 transition py-2 px-1" title="${linkData.text}">
+                                <i class="${linkData.icon} text-lg"></i>
+                            </a>
+                        `;
+                    } else {
+                        // Link com texto (Sobre Nós, Portfólio, Serviços, Orçamento)
+                         html += `<a href="${linkData.target}" class="block text-white hover:text-blue-400 transition py-2 px-1">${linkData.text}</a>`;
+                    }
+                }
+            });
+
+            // 2. Adiciona link de 'Agendamento' (Sempre com texto + ícone)
+            if (GLOBAL_CONFIG.is_schedule_active !== false) {
+                const scheduleData = linkMap.schedule;
+                const scheduleUrl = GLOBAL_CONFIG.schedule_url || '#';
+                
+                html += `
+                    <a href="#" onclick="openScheduleModal('${scheduleUrl}'); return false;" 
+                        class="block text-white hover:text-blue-400 transition py-2 px-1 font-semibold text-blue-300 flex items-center space-x-1"
+                        id="scheduleNavLink"
+                    >
+                        <i class="${scheduleData.icon}"></i> <span>${scheduleData.text}</span>
+                    </a>
+                `;
+            }
+            
+            navMenu.innerHTML = html;
+        }
+
+        function renderHome(data) {
+            GLOBAL_CONFIG = data; // Salva as configs globais
+            
+            // 1. Home Titles (Mantendo a animação de palavras)
+            const homeTitleEl = document.getElementById('homeTitle');
+            const homeSubtitleEl = document.getElementById('homeSubtitle');
+            
+            // Re-renderiza títulos
+            if (homeTitleEl && data.home_title) {
+                const words = data.home_title.split(' ');
+                homeTitleEl.innerHTML = words.map((word, index) => 
+                    `<span class="word-animate" data-delay="${200 * (index + 1)}">${word}</span>`
+                ).join(' ');
+            }
+            if (homeSubtitleEl && data.home_subtitle) {
+                const words = data.home_subtitle.split(' ');
+                homeSubtitleEl.innerHTML = words.map((word, index) => 
+                    `<span class="word-animate" data-delay="${600 + 200 * (index + 1)}">${word}</span>`
+                ).join(' ');
+            }
+
+            // 2. Vídeo de Fundo com Tempo de Início
+            const videoSourceEl = document.getElementById('homeVideoSource');
+            const homeVideoEl = document.getElementById('homeVideo');
+            const startTime = parseInt(data.home_video_start_time, 10) || 0;
+            
+            if (videoSourceEl && homeVideoEl && data.home_video_url) {
+                const timeParam = startTime > 0 ? `#t=${startTime}` : '';
+                videoSourceEl.src = `${data.home_video_url}${timeParam}`;
+                homeVideoEl.load();
+                homeVideoEl.currentTime = startTime; // Tenta forçar o start time
+                homeVideoEl.play().catch(e => console.log('Home video autoplay blocked.'));
+            } else if (homeVideoEl) {
+                homeVideoEl.style.display = 'none';
+            }
+            
+            // 3. Imagem/Logo da Navegação e Rodapé
+            const navLogo = document.getElementById('navLogo');
+            const footerLogo = document.getElementById('footerLogo');
+            if (navLogo && data.logo_url) navLogo.src = data.logo_url;
+            if (footerLogo && data.logo_url) footerLogo.src = data.logo_url;
+            
+            // 4. Links e Contato
+            const whatsappButton = document.getElementById('whatsappFloatButton');
+            const scheduleButton = document.getElementById('scheduleButton');
+            const footerWhatsapp = document.getElementById('footerWhatsappNumber');
+            const footerEmail = document.getElementById('footerEmail');
+
+            const whatsappUrl = `https://wa.me/${data.whatsapp_number}?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento.`;
+            
+            if (whatsappButton) whatsappButton.href = whatsappUrl;
+            if (footerWhatsapp) footerWhatsapp.textContent = formatWhatsapp(data.whatsapp_number);
+            if (footerEmail) footerEmail.textContent = data.email;
+            if (scheduleButton && data.schedule_url) {
+                 scheduleButton.onclick = () => { window.openScheduleModal(data.schedule_url); return false; };
+            } else if (scheduleButton) {
+                 scheduleButton.style.display = 'none'; // Esconde se não houver URL
+            }
+            
+            // 5. Visibilidade de Seções (AQUI VOCÊ CONTROLA QUEM APARECE)
+            toggleSectionVisibility('clients', data.is_clients_active);
+            toggleSectionVisibility('about', data.is_about_active);
+            toggleSectionVisibility('portfolio', data.is_portfolio_active);
+            toggleSectionVisibility('services', data.is_services_active);
+            toggleSectionVisibility('testimonials', data.is_testimonials_active);
+            toggleSectionVisibility('contact', data.is_contact_active);
+            
+            // 6. Título da Seção Clientes
+            const clientsTitleEl = document.getElementById('clientsTitle');
+            if (clientsTitleEl && data.clients_title) clientsTitleEl.textContent = data.clients_title;
+
+            // 7. Renderiza a navegação com base na visibilidade ATUALIZADA
+            renderNavigation();
+
+            // Reinicia as animações (necessário para re-trigger nos novos elementos)
+            animateWords();
+        }
+
+        function renderAbout(data) {
+            const aboutSection = document.getElementById('about');
+            if (!aboutSection || aboutSection.style.display === 'none') return;
+            
+            document.getElementById('aboutTitle').textContent = data.about_title;
+            document.getElementById('aboutP1').textContent = data.about_p1;
+            document.getElementById('aboutP2').textContent = data.about_p2;
+            document.getElementById('aboutImage').src = data.about_image_url;
+        }
+
+        function renderServices(services) {
+            const grid = document.getElementById('servicesGrid');
+            const select = document.getElementById('service');
+            const activeServices = services.filter(s => s.is_active);
+            
+            grid.innerHTML = '';
+            select.innerHTML = '<option value="">Selecione um serviço</option>';
+
+            if (activeServices.length === 0) {
+                 grid.innerHTML = '<p class="text-center text-gray-500 col-span-full">Nenhum serviço ativo.</p>';
+                 select.innerHTML += '<option disabled>Nenhum serviço disponível</option>';
+                 return;
+            }
+
+            activeServices.forEach(item => {
+                // 1. Renderiza o Card de Serviço (Grid)
+                const card = document.createElement('div');
+                let iconContent;
+                
+                if (item.icon && item.icon.startsWith('http')) {
+                    iconContent = `<img src="${item.icon}" alt="Ícone Customizado" class="w-8 h-8 object-contain mb-4">`;
+                } else {
+                    iconContent = `<i class="text-blue-400 ${item.icon} text-3xl mb-4"></i>`;
+                }
+
+                card.className = 'relative rounded-lg bg-gray-800/50 p-6 transition-transform duration-300 group overflow-hidden text-center cursor-pointer hover:-translate-y-2 h-48 flex items-center justify-center';
+                
+                // Configura o clique para selecionar no formulário
+                card.onclick = () => {
+                     document.getElementById('service').value = item.name;
+                     document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                };
+
+                card.innerHTML = `
+                    <div class="absolute inset-0 bg-blue-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 z-0 rounded-lg blur-xl"></div>
+                    <div class="relative z-10 flex flex-col items-center">
+                        ${iconContent}
+                        <h3 class="text-xl font-semibold text-white">${item.name}</h3>
+                        <p class="text-gray-400 text-sm mt-1">${item.subtitle || ''}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+                
+                // 2. Preenche o Select do Formulário de Contato
+                select.innerHTML += `<option value="${item.name}">${item.name} ${item.subtitle ? `(${item.subtitle})` : ''}</option>`;
+            });
+        }
+
+        function renderPortfolio(portfolioItems) {
+            const mainVideoEl = document.getElementById('videoPlayerMain');
+            const mainVideoSourceEl = document.getElementById('videoPlayerMainSource');
+            
+            // Filtra apenas itens ativos
+            portfolioItems = portfolioItems.filter(item => item.is_active !== false);
+            
+            if (portfolioItems.length === 0) return;
+
+            // O primeiro vídeo da lista classificada é o principal (Abaixo do título da seção Portfólio)
+            // Se o Portfólio do Admin tiver o campo 'main_portfolio_video_url' preenchido, ele será usado (definido na renderHome)
+            const mainVideoSourceUrl = GLOBAL_CONFIG.main_portfolio_video_url || portfolioItems[0].url;
+            
+            if (mainVideoSourceEl) mainVideoSourceEl.src = mainVideoSourceUrl;
+            if (mainVideoEl) mainVideoEl.load(); 
+        }
+        
+        function renderTestimonials(items) {
+            const container = document.getElementById('testimonialsCarousel');
+            
+            // Filtra apenas itens ativos
+            items = items.filter(item => item.is_active !== false);
+            
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                 container.innerHTML = '<p class="text-center text-gray-500 col-span-full">Nenhum depoimento disponível.</p>';
+                 return;
+            }
+
+            // Divide os itens em duas colunas para o efeito de rolagem (Marquee vertical)
+            const midPoint = Math.ceil(items.length / 2);
+            const column1 = items.slice(0, midPoint);
+            const column2 = items.slice(midPoint);
+            
+            // Função auxiliar para renderizar uma coluna
+            const renderColumn = (columnItems, duration) => {
+                let html = '<div class="flex flex-col gap-6">';
+                
+                // Duplica os itens para criar o efeito de rolagem infinita
+                const loopedItems = [...columnItems, ...columnItems];
+                
+                loopedItems.forEach(item => {
+                    html += `
+                        <div class="testimonial-card bg-slate-800 p-8 rounded-3xl border border-gray-700 shadow-lg shadow-blue-500/10">
+                            <p class="text-gray-300 mb-6">"${item.quote}"</p>
+                            <div class="flex items-center">
+                                <img src="${item.image_url || 'https://placehold.co/40x40/4b5563/ffffff?text=AV'}" 
+                                    alt="${item.name}" 
+                                    class="w-10 h-10 rounded-full mr-3 object-cover"
+                                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/4b5563/ffffff?text=AV';"
+                                >
+                                <div>
+                                    <h4 class="font-medium text-white">${item.name}</h4>
+                                    <p class="text-sm text-gray-400">${item.title}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                // Container de rolagem
+                return `
+                    <div class="w-full max-w-xs">
+                        <div class="animate-scroll" style="animation-duration: ${duration}s;">
+                            ${html}
+                        </div>
+                    </div>
+                `;
+            };
+
+            // Adiciona as colunas ao container
+            container.innerHTML = renderColumn(column1, 15) + renderColumn(column2, 19);
+            container.classList.add('flex', 'justify-center', 'gap-6', 'mask-overflow');
+        }
+
+        function renderClients(clientLogos) {
+            const marqueeElement = document.getElementById('clientsMarqueeContainer');
+            
+            // Filtra itens ativos, com URL e ordena
+            const items = clientLogos
+                 .filter(item => item.url && item.is_active !== false)
+                 .sort((a, b) => (a.order || 9999) - (b.order || 9999));
+            
+            if (!marqueeElement || items.length === 0) {
+                 marqueeElement.innerHTML = `<p class="text-center text-gray-500">Nenhum logo de cliente para exibir.</p>`;
+                 return;
+            }
+
+            marqueeElement.style.setProperty('--gap', '4rem');
+            const duration = Math.max(20, items.length * 4); 
+            marqueeElement.style.setProperty('--duration', `${duration}s`);
+
+            const displayItems = [...items, ...items]; // Duplica para rolagem infinita
+            let htmlContent = '';
+            
+            displayItems.forEach(item => {
+                // Aplica a classe de estilo de cor (invert/grayscale)
+                const logoClass = item.color_style === 'invert' ? 'invert' : (item.color_style === 'grayscale' ? 'grayscale' : '');
+                
+                htmlContent += `
+                    <div class="flex-shrink-0 flex items-center justify-center">
+                        <img src="${item.url}" alt="${item.name || 'Logo Cliente'}" 
+                            class="h-8 md:h-11 ${logoClass}" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/120x60/1f2937/ffffff?text=LOGO';"
+                        >
+                    </div>
+                `;
+            });
+            
+            // CORREÇÃO AQUI: Adiciona classes flex, items-center, whitespace-nowrap e gap-16
+            marqueeElement.innerHTML = `
+                <div class="marquee-wrapper animate-marquee flex items-center whitespace-nowrap gap-16" style="animation-duration: ${duration}s;">
+                    ${htmlContent}
+                </div>
+                <div class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-gray-800"></div>
+                <div class="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-gray-800"></div>
+            `;
+        }
+        
+        // --- 2. LÓGICA DE FIREBASE (LISTENERS) ---
+        
+        function setupRealtimeListeners() {
+            const initialAuthToken = auth.currentUser?.uid || null;
+
+            // 1. Autenticação Anônima para Leitura
+            if (!initialAuthToken) {
+                 signInAnonymously(auth).catch(error => {
+                     console.error("Falha na autenticação anônima para leitura:", error);
+                 });
+            }
+
+            // 2. Listener Configurações Globais (Home, Nav, Contato, Visibilidade)
+            onSnapshot(collections.config, (docSnap) => {
+                if (docSnap.exists()) {
+                    renderHome(docSnap.data());
+                }
+            }, (error) => console.error("Erro ao carregar Config Global:", error));
+            
+            // 3. Listener Sobre Nós
+            onSnapshot(collections.about, (docSnap) => {
+                if (docSnap.exists()) {
+                    renderAbout(docSnap.data());
+                }
+            }, (error) => console.error("Erro ao carregar Config About:", error));
+            
+            // 4. Listener Serviços (Ordenado por timestamp para lista mais recente)
+            onSnapshot(query(collections.services), (querySnapshot) => {
+                const items = [];
+                querySnapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                renderServices(items);
+            }, (error) => console.error("Erro ao carregar Services:", error));
+            
+            // 5. Listener Portfólio (Ordenado pelo campo 'order' para DnD)
+            onSnapshot(query(collections.portfolio), (querySnapshot) => {
+                const items = [];
+                querySnapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                // Ordena localmente pelo campo 'order' que é definido pelo DnD do Admin
+                items.sort((a, b) => (a.order || 9999) - (b.order || 9999));
+                renderPortfolio(items);
+            }, (error) => console.error("Erro ao carregar Portfolio:", error));
+            
+            // 6. Listener Depoimentos (Ordenado por timestamp para lista mais recente)
+            onSnapshot(query(collections.testimonials), (querySnapshot) => {
+                const items = [];
+                querySnapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                renderTestimonials(items);
+            }, (error) => console.error("Erro ao carregar Testimonials:", error));
+            
+            // 7. Listener Clientes (Ordenado pelo campo 'order' para DnD)
+            onSnapshot(query(collections.clients), (querySnapshot) => {
+                const items = [];
+                querySnapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                // Ordena localmente pelo campo 'order' que é definido pelo DnD do Admin
+                items.sort((a, b) => (a.order || 9999) - (b.order || 9999));
+                renderClients(items);
+            }, (error) => console.error("Erro ao carregar Clients:", error));
+        }
+        
+        // --- 3. FUNÇÕES DE SUPORTE ---
+        
+        function formatWhatsapp(number) {
+            // Formata 5519993252814 para (19) 99325-2814
+            const clean = ('' + number).replace(/\D/g, '');
+            const match = clean.match(/^(\d{2})(\d{5})(\d{4})$/);
+            if (match) {
+              return `(${match[1]}) ${match[2]}-${match[3]}`;
+            }
+            return number;
+        }
+
+        function toggleSectionVisibility(id, isActive) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.display = isActive ? '' : 'none';
+            }
+            // A renderização da navegação é tratada de forma centralizada em renderNavigation
+        }
+        
+        // --- 4. LÓGICA DE ANIMAÇÃO E INTERAÇÃO ---
+
+        // Lógica para re-aplicar a animação das palavras nos títulos dinâmicos
+        function animateWords() {
+            const words = document.querySelectorAll('.word-animate');
+            words.forEach((word, index) => {
+                const delay = parseInt(word.getAttribute('data-delay')) || index * 200;
+                setTimeout(() => {
+                    word.style.animation = 'word-appear 0.8s ease-out forwards';
+                }, delay);
+            });
+            
+            // Efeito de sombra ao passar o mouse nas palavras
+            words.forEach(word => {
+                word.addEventListener('mouseenter', () => {
+                word.style.textShadow = '0 0 20px rgba(203, 213, 225, 0.5)';
+                });
+                word.addEventListener('mouseleave', () => {
+                    word.style.textShadow = 'none';
+                });
+            });
+        }
+        
+        // Lógica do Modal de Experiência Portfólio
+        window.openExperienceModal = function() {
+            const modal = document.getElementById('experienceModal');
+            const iframe = document.getElementById('experienceIframe');
+            iframe.src = 'https://stream-aem.vercel.app/';
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeExperienceModal = function() {
+            const modal = document.getElementById('experienceModal');
+            const iframe = document.getElementById('experienceIframe');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                iframe.src = '';
+            }, 300);
+            document.body.style.overflow = 'auto';
+        };
+
+        // Lógica do Modal de Agendamento
+        window.openScheduleModal = function(url) {
+            const scheduleModal = document.getElementById('scheduleModal');
+            const scheduleIframe = document.getElementById('scheduleIframe');
+            
+            if (scheduleIframe) {
+                scheduleIframe.src = url;
+            }
+            
+            scheduleModal.classList.remove('hidden');
+            setTimeout(() => {
+                scheduleModal.classList.add('open');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+            document.querySelector('#mainNav').style.display = 'none';
+        }
+
+        window.closeScheduleModal = function() {
+            const scheduleModal = document.getElementById('scheduleModal');
+            const scheduleIframe = document.getElementById('scheduleIframe');
+            
+            scheduleModal.classList.remove('open');
+            
+            setTimeout(() => {
+                scheduleModal.classList.add('hidden');
+                if (scheduleIframe) {
+                     scheduleIframe.src = '';
+                }
+            }, 300);
+
+            document.body.style.overflow = 'auto';
+            document.querySelector('#mainNav').style.display = 'flex';
+        }
+
+        // Lógica da Galeria (Modal/Lightbox) e Autoplay
+        const modal = document.getElementById('videoModal');
+
+        function initializeGalleryVideos() {
+            const galleryVideos = document.querySelectorAll('#portfolioGallery .gallery-video');
+            galleryVideos.forEach(video => {
+                video.setAttribute('loop', 'true');
+                video.setAttribute('muted', 'true');
+                video.setAttribute('playsinline', 'true');
+                
+                video.play().catch(e => {
+                    console.log(`Autoplay para vídeo da galeria bloqueado (erro: ${e.name}).`);
+                    video.pause(); 
+                });
+            });
+        }
+
+        function pauseGalleryVideos() {
+             document.querySelectorAll('#portfolioGallery .gallery-video').forEach(video => video.pause());
+        }
+
+        window.openModal = function(el) {
+            const videoUrl = el.getAttribute('data-url');
+            const modalContent = document.getElementById('modalContent');
+            
+            pauseGalleryVideos();
+
+            const modalVideo = document.createElement('video');
+            modalVideo.id = 'modalVideo';
+            modalVideo.src = videoUrl;
+            modalVideo.setAttribute('controls', 'true');
+            modalVideo.setAttribute('autoplay', 'true');
+            modalVideo.setAttribute('playsinline', 'true');
+            modalVideo.removeAttribute('loop');
+            modalVideo.removeAttribute('muted'); 
+
+            modalContent.innerHTML = '';
+            modalContent.appendChild(modalVideo);
+
+            modalContent.classList.remove('ratio-16-9', 'ratio-9-16');
+            modalContent.classList.add('ratio-16-9'); 
+
+            modal.classList.add('open');
+            
+            document.body.style.overflow = 'hidden';
+            document.querySelector('#mainNav').style.display = 'none';
+
+            modalVideo.play().catch(e => console.log("Erro ao tentar autoplay no modal: ", e.name));
+        }
+
+        window.closeModal = function() {
+            const modalVideo = document.getElementById('modalVideo');
+            if (modalVideo) {
+                modalVideo.pause();
+                modalVideo.removeAttribute('src');
+            }
+
+            modal.classList.remove('open');
+
+            document.body.style.overflow = 'auto';
+            document.querySelector('#mainNav').style.display = 'flex'; 
+
+            initializeGalleryVideos();
+        }
+        
+        // --- 5. SETUP E LISTENERS GERAIS ---
+
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Efeito de gradiente que segue o mouse
+            const mouseGradient = document.getElementById('mouse-gradient-react');
+            document.addEventListener('mousemove', (e) => {
+                if (mouseGradient) {
+                    mouseGradient.style.transform = `translate(-50%, -50%)`;
+                    mouseGradient.style.left = `${e.clientX}px`;
+                    mouseGradient.style.top = `${e.clientY}px`;
+                    mouseGradient.style.opacity = '1';
+                }
+            });
+            
+            document.addEventListener('mouseleave', () => {
+                if (mouseGradient) {
+                    mouseGradient.style.opacity = '0';
+                }
+            });
+            
+            // Efeito de "ripple" (onda) ao clicar
+            document.addEventListener('click', (e) => {
+                const ripple = document.createElement('div');
+                ripple.className = 'ripple-effect';
+                ripple.style.left = `${e.clientX}px`;
+                ripple.style.top = `${e.clientY}px`;
+                document.body.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+            });
+
+            // Formulário de Orçamento (Contato)
+            const form = document.getElementById('budget-form');
+            if(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const phone = document.getElementById('phone').value;
+                    const company = document.getElementById('company').value;
+                    const serviceSelect = document.getElementById('service');
+                    const serviceText = serviceSelect.options[serviceSelect.selectedIndex].text;
+                    const date = document.getElementById('date').value;
+                    const message = document.getElementById('message').value;
+                    
+                    const whatsappMessage = `*Nova solicitação de orçamento:*%0A%0A` +
+                        `*Nome:* ${name}%0A` +
+                        `*E-mail:* ${email}%0A` +
+                        `*Telefone:* ${phone}%0A` +
+                        (company ? `*Empresa:* ${company}%0A` : '') +
+                        `*Serviço:* ${serviceText}%0A` +
+                        (date ? `*Data prevista:* ${date}%0A` : '') +
+                        (message ? `*Detalhes:*%0A${message}` : '');
+                    
+                    window.open(`https://wa.me/${GLOBAL_CONFIG.whatsapp_number}?text=${whatsappMessage}`, '_blank');
+                    
+                    createNotification('success', 'Solicitação enviada!', 'Entraremos em contato em breve.');
+                    
+                    form.reset();
+                });
+            }
+            
+            // Menu Mobile
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('main-menu');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Adiciona listener para fechar o menu ao clicar em qualquer link (incluindo os dinâmicos)
+            // Usamos event delegation no elemento pai para garantir que funcione para elementos injetados
+            mobileMenu.addEventListener('click', (e) => {
+                if (e.target.closest('a')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+
+            // Listener para fechar modais com ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('open')) {
+                    closeModal();
+                } else if (e.key === 'Escape' && document.getElementById('scheduleModal').classList.contains('open')) {
+                    closeScheduleModal();
+                }
+            });
+
+        });
+        
+        // Chamada de inicialização do Firebase para carregar tudo
+        setupRealtimeListeners();
+    </script>
+</body>
+</html>
