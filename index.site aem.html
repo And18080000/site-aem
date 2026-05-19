@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A&M Produções - Produtora Audiovisual</title>
+    <link rel="preload" as="image" href="https://res.cloudinary.com/dkjc5y76w/image/upload/v1761668741/3_f9cu8v_1_cibmar.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Custom CSS from original site */
         @keyframes word-appear {
-            0% { opacity: 0; transform: translateY(30px) scale(0.8); filter: blur(10px); }
-            50% { opacity: 0.8; transform: translateY(10px) scale(0.95); filter: blur(2px); }
-            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            0% { opacity: 0; transform: translateX(60px); filter: blur(20px); letter-spacing: 0.2em; }
+            100% { opacity: 1; transform: translateX(0); filter: blur(0); letter-spacing: normal; }
         }
         
         .word-animate {
@@ -81,19 +81,80 @@
              background: #64748b;
        }
 
-        /* Testimonials Scroll Animation */
-        @keyframes scroll {
-             0% { transform: translateY(0); }
-             100% { transform: translateY(-50%); }
+        /* Testimonials Scroll Animation - Horizontal */
+        @keyframes scroll-x {
+             0% { transform: translateX(0); }
+             100% { transform: translateX(-50%); }
         }
 
-        .animate-scroll {
-             animation: scroll linear infinite;
+        .animate-scroll-horizontal {
+             animation: scroll-x linear infinite;
         }
+        .reveal {
+            opacity: 0;
+            transform: translateY(80px) scale(0.95);
+            filter: blur(15px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+        .service-card-3d {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        .service-card-3d:hover {
+            transform: rotateY(15deg) rotateX(5deg) scale(1.05);
+            box-shadow: -20px 20px 50px rgba(59, 130, 246, 0.2);
+        }
+        @keyframes icon-cam { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+        @keyframes icon-play { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        @keyframes icon-film { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .group:hover .fa-video, .group:hover .fa-camera { animation: icon-cam 2s ease-in-out infinite; }
+        .group:hover .fa-play-circle, .group:hover .fa-play { animation: icon-play 1.5s ease-in-out infinite; }
+        .group:hover .fa-film { animation: icon-film 2s ease-in-out infinite; }
         .mask-overflow {
              mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
              -webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
         }
+        .form-glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-glass:focus-within {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
+        }
+        .input-icon-focus { color: rgba(255,255,255,0.4); transition: color 0.3s; }
+        .form-glass:focus-within .input-icon-focus { color: #3b82f6; }
+        
+        /* Wallpaper Video Background */
+        .bg-video-wallpaper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            filter: blur(40px) brightness(0.4);
+            pointer-events: none;
+            object-fit: cover;
+        }
+        body.is-scrolled .bg-video-wallpaper {
+            opacity: 0.15;
+        }
+        section {
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.95) !important; /* Mantém o site preto com leve transparência para o wallpaper */
+        }
+        #home { background-color: transparent !important; }
         /* --- FIM DOS ESTILOS NÃO RELACIONADOS À GALERIA/MODAL --- */
         
 
@@ -104,8 +165,9 @@
             height: 60px;
             bottom: 40px;
             right: 40px;
-            background-color: #25D366;
+            background-color: #000;
             color: #FFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 50px;
             text-align: center;
             font-size: 30px;
@@ -367,13 +429,18 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white font-sans overflow-x-hidden">
+<body class="bg-black text-white font-sans overflow-x-hidden">
     
+    <!-- VIDEO WALLPAPER BACKGROUND -->
+    <video id="bgWallpaperVideo" autoplay loop muted playsinline class="bg-video-wallpaper">
+        <source id="bgWallpaperSource" src="" type="video/mp4">
+    </video>
+
     <!-- ONDE O LOGO E LINKS DE NAVEGAÇÃO SÃO DINAMIZADOS -->
     <nav id="mainNav" class="fixed w-full z-50 bg-black/50 backdrop-blur-md transition-all duration-300">
         <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
             <a href="#home" id="navLogoLink" class="flex items-center">
-                <!-- LOGO DINÂMICA --><img id="navLogo" src="https://res.cloudinary.com/dkjc5y76w/image/upload/v1761668741/3_f9cu8v_1_cibmar.png" alt="A&M Produções" class="h-12">
+                <!-- LOGO DINÂMICA --><img id="navLogo" src="https://res.cloudinary.com/dkjc5y76w/image/upload/v1761668741/3_f9cu8v_1_cibmar.png" alt="A&M Produções" class="h-12" fetchpriority="high" loading="eager">
             </a>
             
             <!-- Menu de navegação ajustado para compactação e ícones -->
@@ -396,13 +463,13 @@
             <source id="homeVideoSource" src="" type="video/mp4">
         </video>
         
-        <div class="container mx-auto px-4 sm:px-6 relative z-20 text-center">
-            <h1 id="homeTitle" class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-slide-up" style="animation-delay: 0.2s;">
+        <div class="container mx-auto px-4 sm:px-6 relative z-20 text-right flex flex-col items-end">
+            <h1 id="homeTitle" class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-slide-up tracking-tighter" style="animation-delay: 0.2s; text-shadow: 0 0 30px rgba(255,255,255,0.1);">
                 <!-- O TÍTULO DINÂMICO ENTRA AQUI -->
                 <span class="word-animate" data-delay="200">A&M</span>
                 <span class="word-animate" data-delay="400">Produções</span>
             </h1>
-            <p id="homeSubtitle" class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-3xl mx-auto animate-slide-up" style="animation-delay: 0.4s;">
+            <p id="homeSubtitle" class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-xl animate-slide-up font-light" style="animation-delay: 0.4s;">
                 <!-- O SUBTÍTULO DINÂMICO ENTRA AQUI -->
                 <span class="word-animate" data-delay="600">Criando</span>
                 <span class="word-animate" data-delay="800">experiências</span>
@@ -410,18 +477,7 @@
                 <span class="word-animate" data-delay="1200">que</span>
                 <span class="word-animate" data-delay="1400">inspiram</span>
             </p>
-            <!-- BOTÕES NA HOME ATUALIZADOS -->
-            <div class="flex flex-col sm:flex-row justify-center gap-4 animate-slide-up" style="animation-delay: 0.6s;">
-                <!-- Botão Agendar Horário (Link Dinâmico) --><a id="scheduleButton" href="#" onclick="openScheduleModal(GLOBAL_CONFIG.schedule_url); return false;" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-semibold transition duration-300">
-                    Agendar Horário
-                </a>
-                <a href="#contact" class="bg-transparent border border-white hover:bg-white/10 text-white px-8 py-3 rounded-full font-semibold transition duration-300">
-                    Solicitar Orçamento
-                </a>
-                <a href="#videoPlayerMain" class="bg-transparent border border-white hover:bg-white/10 text-white px-8 py-3 rounded-full font-semibold transition duration-300">
-                    Ver Portfólio
-                </a>
-            </div>
+            <!-- BOTÕES NA HOME REMOVIDOS -->
         </div>
         
         <!-- Elementos flutuantes de detalhe --><div class="floating-element-animate" style="top: 25%; left: 15%; animation-delay: 0.5s"></div>
@@ -433,7 +489,7 @@
     </section>
 
     <!-- ONDE A SEÇÃO CLIENTES É DINAMIZADA -->
-    <section id="clients" class="py-12 bg-gray-800">
+    <section id="clients" class="py-12 bg-black">
         <div class="container mx-auto px-4 sm:px-6">
             <h2 id="clientsTitle" class="text-2xl md:text-3xl font-bold text-center mb-8">Nossos Clientes</h2>
             
@@ -445,10 +501,10 @@
     </section>
 
     <!-- ONDE A SEÇÃO SOBRE NÓS É DINAMIZADA -->
-    <section id="about" class="py-16 sm:py-20 bg-gray-900">
+    <section id="about" class="py-16 sm:py-20 bg-black overflow-hidden">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex flex-col lg:flex-row items-center gap-12">
-                <div class="lg:w-1/2 animate-fade-in">
+                <div class="lg:w-1/2 reveal">
                     <h2 id="aboutTitle" class="text-3xl sm:text-4xl font-bold mb-6">Sobre Nós</h2>
                     <p id="aboutP1" class="text-lg md:text-xl mb-6 text-gray-300">
                         A A&M Produções é uma produtora audiovisual especializada em criar conteúdo de alta qualidade que conta histórias e engaja audiências.
@@ -478,7 +534,7 @@
                     </div>
                 </div>
                 
-                <div class="lg:w-1/2 relative animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="lg:w-1/2 relative reveal" style="transition-delay: 0.3s;">
                     <div class="aspect-w-16 aspect-h-9 bg-gray-800 rounded-xl overflow-hidden">
                         <!-- IMAGEM DESTAQUE DINÂMICA --><img id="aboutImage" src="https://res.cloudinary.com/dkjc5y76w/image/upload/v1761666149/aem_disgner_02_sbeocc.png" alt="Equipe da A&M Produções filmando com equipamento profissional" class="w-full h-full object-cover">
                     </div>
@@ -531,7 +587,7 @@
     </section>
 
     <!-- ONDE A SEÇÃO SERVIÇOS É DINAMIZADA -->
-    <section id="services" class="py-16 sm:py-20 bg-gray-900">
+    <section id="services" class="py-16 sm:py-20 bg-black">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="text-center mb-12">
                 <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Nossos Serviços</h2>
@@ -546,7 +602,7 @@
     </section>
     
     <!-- ONDE A SEÇÃO DEPOIMENTOS É DINAMIZADA -->
-    <section id="testimonials" class="py-16 sm:py-20 bg-gray-800">
+    <section id="testimonials" class="py-16 sm:py-20 bg-black overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-purple-900/30 opacity-30"></div>
         <div class="container mx-auto px-4 sm:px-6 relative z-10">
             <div class="flex flex-col items-center justify-center max-w-2xl mx-auto text-center mb-16">
@@ -554,77 +610,143 @@
                     Depoimentos
                 </span>
                 <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
-                    O que nossos clientes dizem
+                    Vozes da Experiência
                 </h2>
                 <p class="text-gray-300 text-lg">
-                    Veja o que nossos clientes têm a dizer sobre nós.
+                    Histórias de sucesso contadas por quem confia no nosso olhar.
                 </p>
             </div>
+        </div>
     
-            <!-- Carrossel de Depoimentos com Animação de Rolagem Vertical (Marquee) -->
-            <div id="testimonialsCarousel" class="flex justify-center gap-6 mask-overflow max-h-[740px] overflow-hidden">
-                <!-- COLUNAS DE DEPOIMENTOS DINÂMICAS SERÃO INJETADAS AQUI -->
-                <p class="text-center text-gray-500">Carregando depoimentos...</p>
+        <!-- Carrossel de Depoimentos Horizontal -->
+        <div id="testimonialsCarousel" class="relative w-full overflow-hidden mask-overflow-h py-10">
+            <!-- LINHA DE DEPOIMENTOS DINÂMICA SERÁ INJETADA AQUI -->
+        </div>
+
+        <!-- MODAL DE EXPANSÃO DE DEPOIMENTO -->
+        <div id="testimonialModal" class="fixed inset-0 z-[11000] hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="closeTestimonialModal()"></div>
+            <div class="relative bg-neutral-900 border border-white/10 p-8 rounded-3xl max-w-2xl w-full shadow-2xl transform transition-all duration-300 scale-95 opacity-0" id="testimonialModalContent">
+                <button onclick="closeTestimonialModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+                <div class="flex items-center gap-4 mb-6">
+                    <img id="tm-img" src="" class="w-20 h-20 rounded-full object-cover border-2 border-blue-500">
+                    <div>
+                        <h3 id="tm-name" class="text-2xl font-bold text-white"></h3>
+                        <p id="tm-title" class="text-blue-400 font-medium"></p>
+                    </div>
+                </div>
+                <p id="tm-quote" class="text-xl text-gray-300 leading-relaxed italic"></p>
+            </div>
+        </div>
+
+        <!-- MODAL DE EXPANSÃO DE SERVIÇO -->
+        <div id="serviceModal" class="fixed inset-0 z-[12000] hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl" onclick="closeServiceModal()"></div>
+            <div class="relative bg-neutral-900 border border-white/10 rounded-[2.5rem] max-w-5xl w-full shadow-2xl transform transition-all duration-500 scale-95 opacity-0 overflow-hidden flex flex-col md:flex-row" id="serviceModalContent">
+                <button onclick="closeServiceModal()" class="absolute top-6 right-6 z-20 text-white/50 hover:text-white bg-black/20 hover:bg-black/50 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-xl"><i class="fas fa-times"></i></button>
+                
+                <div class="md:w-1/2 h-64 md:h-auto relative overflow-hidden">
+                    <img id="sm-image" src="" class="w-full h-full object-cover transform transition-transform duration-[2s] hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-transparent md:bg-gradient-to-r"></div>
+                </div>
+                
+                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                    <div id="sm-icon-container" class="mb-6"></div>
+                    <h3 id="sm-name" class="text-3xl md:text-5xl font-bold text-white mb-2 leading-tight"></h3>
+                    <p id="sm-subtitle" class="text-blue-400 font-bold tracking-[0.3em] uppercase text-xs mb-6"></p>
+                    <div class="w-16 h-1.5 bg-blue-600 mb-8 rounded-full"></div>
+                    <p id="sm-description" class="text-gray-300 text-lg leading-relaxed mb-10"></p>
+                    
+                    <button id="sm-cta" class="group bg-blue-600 hover:bg-blue-500 text-white px-10 py-5 rounded-2xl font-bold transition-all w-fit flex items-center gap-3 shadow-[0_10px_30px_rgba(37,99,235,0.3)]">
+                        Solicitar este serviço <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+            <div class="relative bg-neutral-900 border border-white/10 p-8 rounded-3xl max-w-2xl w-full shadow-2xl transform transition-all duration-300 scale-95 opacity-0" id="testimonialModalContent">
+                <button onclick="closeTestimonialModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+                <div class="flex items-center gap-4 mb-6">
+                    <img id="tm-img" src="" class="w-20 h-20 rounded-full object-cover border-2 border-blue-500">
+                    <div>
+                        <h3 id="tm-name" class="text-2xl font-bold text-white"></h3>
+                        <p id="tm-title" class="text-blue-400 font-medium"></p>
+                    </div>
+                </div>
+                <p id="tm-quote" class="text-xl text-gray-300 leading-relaxed italic"></p>
             </div>
         </div>
     </section>
 
     <!-- ONDE A SEÇÃO CONTATO/ORÇAMENTO É DINAMIZADA -->
-    <section id="contact" class="py-16 sm:py-20 bg-gray-900">
+    <section id="contact" class="py-20 bg-black relative">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-12 text-center">Solicite um Orçamento</h2>
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-blue-500 font-bold tracking-[0.3em] uppercase text-sm">Briefing Online</span>
+                    <h2 class="text-4xl md:text-5xl font-bold mt-4 mb-6">Vamos tirar seu projeto do papel?</h2>
+                    <p class="text-gray-400 text-lg">Preencha os campos abaixo e receba uma proposta personalizada em até 24h.</p>
+                </div>
                 
-                <form id="budget-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
-                        <h3 class="text-xl font-semibold mb-4">Informações Pessoais</h3>
+                <form id="budget-form" class="grid grid-cols-1 md:grid-cols-6 gap-6 reveal" style="transition-delay: 0.2s;">
+                    <div class="md:col-span-3">
+                        <div class="form-glass p-2 rounded-2xl flex items-center">
+                            <i class="fas fa-user ml-4 input-icon-focus"></i>
+                            <input type="text" id="name" name="name" required placeholder="Nome completo" class="w-full px-4 py-3 bg-transparent text-white focus:outline-none">
+                        </div>
                     </div>
                     
-                    <div>
-                        <label for="name" class="block mb-2">Nome completo</label>
-                        <input type="text" id="name" name="name" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="md:col-span-3">
+                        <div class="form-glass p-2 rounded-2xl flex items-center">
+                            <i class="fas fa-envelope ml-4 input-icon-focus"></i>
+                            <input type="email" id="email" name="email" required placeholder="Seu melhor e-mail" class="w-full px-4 py-3 bg-transparent text-white focus:outline-none">
+                        </div>
                     </div>
                     
-                    <div>
-                        <label for="email" class="block mb-2">E-mail</label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="md:col-span-3">
+                        <div class="form-glass p-2 rounded-2xl flex items-center">
+                            <i class="fab fa-whatsapp ml-4 input-icon-focus"></i>
+                            <input type="tel" id="phone" name="phone" required placeholder="WhatsApp (com DDD)" class="w-full px-4 py-3 bg-transparent text-white focus:outline-none">
+                        </div>
                     </div>
                     
-                    <div>
-                        <label for="phone" class="block mb-2">Telefone</label>
-                        <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="md:col-span-3">
+                        <div class="form-glass p-2 rounded-2xl flex items-center">
+                            <i class="fas fa-briefcase ml-4 input-icon-focus"></i>
+                            <input type="text" id="company" name="company" placeholder="Sua empresa ou marca" class="w-full px-4 py-3 bg-transparent text-white focus:outline-none">
+                        </div>
                     </div>
                     
-                    <div>
-                        <label for="company" class="block mb-2">Empresa (opcional)</label>
-                        <input type="text" id="company" name="company" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    
-                    <div class="md:col-span-2">
-                        <h3 class="text-xl font-semibold mb-4">Detalhes do Projeto</h3>
-                    </div>
-                    
-                    <div class="md:col-span-2">
-                        <label for="service" class="block mb-2">Tipo de Serviço</label>
-                        <!-- SELECT DE SERVIÇOS DINÂMICO --><select id="service" name="service" required class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <!-- Opções dinâmicas injetadas via JS -->
-                            <option value="">Carregando serviços...</option>
-                        </select>
-                    </div>
-                    
-                    <div class="md:col-span-2">
-                        <label for="date" class="block mb-2">Data prevista para o projeto (opcional)</label>
-                        <input type="date" id="date" name="date" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="md:col-span-4">
+                        <div class="form-glass p-2 rounded-2xl flex items-center relative">
+                            <i class="fas fa-clapperboard ml-4 input-icon-focus"></i>
+                            <select id="service" name="service" required class="w-full px-4 py-3 bg-transparent text-white focus:outline-none appearance-none cursor-pointer">
+                                <option value="" class="bg-neutral-900">Qual serviço você procura?</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-6 pointer-events-none text-gray-600"></i>
+                        </div>
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label for="message" class="block mb-2">Detalhes e observações</label>
-                        <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <div class="form-glass p-2 rounded-2xl flex items-center">
+                            <i class="fas fa-calendar ml-4 input-icon-focus"></i>
+                            <input type="date" id="date" name="date" class="w-full px-4 py-3 bg-transparent text-white focus:outline-none [color-scheme:dark]">
+                        </div>
                     </div>
                     
-                    <div class="md:col-span-2 flex justify-center">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold transition duration-300">
-                            Enviar Solicitação
+                    <div class="md:col-span-6">
+                        <div class="form-glass p-4 rounded-3xl">
+                            <label for="message" class="block text-sm text-gray-500 mb-2 ml-2">Conte-nos mais sobre seu objetivo...</label>
+                            <textarea id="message" name="message" rows="5" placeholder="Ex: Preciso de um vídeo institucional de 2 minutos para minha nova campanha..." class="w-full px-4 py-2 bg-transparent text-white focus:outline-none resize-none"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-6 flex justify-center mt-6">
+                        <button type="submit" class="group relative bg-blue-600 hover:bg-blue-500 text-white px-12 py-5 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-105 shadow-[0_0_40px_rgba(37,99,235,0.3)]">
+                            <span class="flex items-center gap-3">
+                                <i class="fas fa-paper-plane group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+                                Solicitar Orçamento Grátis
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -665,7 +787,7 @@
                         <ul class="space-y-2">
                             <li class="flex items-center">
                                 <i class="fas fa-phone-alt text-gray-400 mr-2"></i>
-                                <span id="footerWhatsappNumber" class="text-gray-400">(19) 99325-2814</span>
+                                <span id="footerWhatsappNumber" class="text-gray-400">(19) 92004-6344</span>
                             </li>
                             <li class="flex items-center">
                                 <i class="fas fa-envelope text-gray-400 mr-2"></i>
@@ -913,23 +1035,32 @@
             // 2. Vídeo de Fundo com Tempo de Início
             const videoSourceEl = document.getElementById('homeVideoSource');
             const homeVideoEl = document.getElementById('homeVideo');
+            const bgWallpaperSource = document.getElementById('bgWallpaperSource');
+            const bgWallpaperVideo = document.getElementById('bgWallpaperVideo');
             const startTime = parseInt(data.home_video_start_time, 10) || 0;
             
             if (videoSourceEl && homeVideoEl && data.home_video_url) {
                 const timeParam = startTime > 0 ? `#t=${startTime}` : '';
                 videoSourceEl.src = `${data.home_video_url}${timeParam}`;
                 homeVideoEl.load();
-                homeVideoEl.currentTime = startTime; // Tenta forçar o start time
+                homeVideoEl.currentTime = startTime;
                 homeVideoEl.play().catch(e => console.log('Home video autoplay blocked.'));
+
+                // Sincroniza o vídeo de papel de parede
+                if (bgWallpaperSource && bgWallpaperVideo) {
+                    bgWallpaperSource.src = data.home_video_url;
+                    bgWallpaperVideo.load();
+                    bgWallpaperVideo.play().catch(() => {});
+                }
             } else if (homeVideoEl) {
                 homeVideoEl.style.display = 'none';
             }
             
-            // 3. Imagem/Logo da Navegação e Rodapé
+            // 3. Imagem/Logo da Navegação e Rodapé - Atualiza apenas se houver mudança para garantir carregamento instantâneo
             const navLogo = document.getElementById('navLogo');
             const footerLogo = document.getElementById('footerLogo');
-            if (navLogo && data.logo_url) navLogo.src = data.logo_url;
-            if (footerLogo && data.logo_url) footerLogo.src = data.logo_url;
+            if (navLogo && data.logo_url && navLogo.src !== data.logo_url) navLogo.src = data.logo_url;
+            if (footerLogo && data.logo_url && footerLogo.src !== data.logo_url) footerLogo.src = data.logo_url;
             
             // 4. Links e Contato
             const whatsappButton = document.getElementById('whatsappFloatButton');
@@ -937,7 +1068,7 @@
             const footerWhatsapp = document.getElementById('footerWhatsappNumber');
             const footerEmail = document.getElementById('footerEmail');
 
-            const whatsappUrl = `https://wa.me/${data.whatsapp_number}?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento.`;
+            const whatsappUrl = `https://wa.me/5519920046344?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento.`;
             
             if (whatsappButton) whatsappButton.href = whatsappUrl;
             if (footerWhatsapp) footerWhatsapp.textContent = formatWhatsapp(data.whatsapp_number);
@@ -991,34 +1122,44 @@
                  return;
             }
 
-            activeServices.forEach(item => {
+            activeServices.forEach((item, index) => {
                 // 1. Renderiza o Card de Serviço (Grid)
                 const card = document.createElement('div');
                 let iconContent;
                 
                 if (item.icon && item.icon.startsWith('http')) {
-                    iconContent = `<img src="${item.icon}" alt="Ícone Customizado" class="w-8 h-8 object-contain mb-4">`;
+                    iconContent = `<img src="${item.icon}" alt="Ícone Customizado" class="w-10 h-10 object-contain mb-4 transition-all duration-500 group-hover:scale-110">`;
                 } else {
-                    iconContent = `<i class="text-blue-400 ${item.icon} text-3xl mb-4"></i>`;
+                    iconContent = `<i class="text-blue-500 ${item.icon} text-4xl mb-4 transition-all duration-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"></i>`;
                 }
 
-                card.className = 'relative rounded-lg bg-gray-800/50 p-6 transition-transform duration-300 group overflow-hidden text-center cursor-pointer hover:-translate-y-2 h-48 flex items-center justify-center';
+                card.className = 'reveal service-card-3d relative rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 p-8 transition-all duration-500 group overflow-hidden text-center cursor-pointer h-64 flex items-center justify-center backdrop-blur-xl';
+                card.style.transitionDelay = `${index * 0.15}s`;
                 
-                // Configura o clique para selecionar no formulário
+                // Configura o clique para expandir o serviço
                 card.onclick = () => {
-                     document.getElementById('service').value = item.name;
-                     document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                     openServiceModal(item);
                 };
 
                 card.innerHTML = `
-                    <div class="absolute inset-0 bg-blue-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 z-0 rounded-lg blur-xl"></div>
-                    <div class="relative z-10 flex flex-col items-center">
-                        ${iconContent}
-                        <h3 class="text-xl font-semibold text-white">${item.name}</h3>
-                        <p class="text-gray-400 text-sm mt-1">${item.subtitle || ''}</p>
+                    <div class="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-transparent to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative z-10 flex flex-col items-center transform-gpu transition-transform duration-500 group-hover:translate-z-10">
+                        <div class="mb-4 transform transition-transform duration-500 group-hover:scale-110">${iconContent}</div>
+                        <h3 class="text-2xl font-bold text-white tracking-tight">${item.name}</h3>
+                        <p class="text-blue-400/80 text-sm font-medium mt-2 uppercase tracking-widest">${item.subtitle || ''}</p>
+                        <div class="mt-4 w-0 h-1 bg-blue-500 transition-all duration-500 group-hover:w-full"></div>
                     </div>
                 `;
                 grid.appendChild(card);
+                
+                // Ativa a observação de scroll para o novo card injetado
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('active');
+                        else entry.target.classList.remove('active');
+                    });
+                }, { threshold: 0.1 });
+                observer.observe(card);
                 
                 // 2. Preenche o Select do Formulário de Contato
                 select.innerHTML += `<option value="${item.name}">${item.name} ${item.subtitle ? `(${item.subtitle})` : ''}</option>`;
@@ -1044,63 +1185,105 @@
         
         function renderTestimonials(items) {
             const container = document.getElementById('testimonialsCarousel');
-            
-            // Filtra apenas itens ativos
             items = items.filter(item => item.is_active !== false);
-            
-            container.innerHTML = '';
-            
-            if (items.length === 0) {
-                 container.innerHTML = '<p class="text-center text-gray-500 col-span-full">Nenhum depoimento disponível.</p>';
-                 return;
-            }
+            if (items.length === 0) return;
 
-            // Divide os itens em duas colunas para o efeito de rolagem (Marquee vertical)
-            const midPoint = Math.ceil(items.length / 2);
-            const column1 = items.slice(0, midPoint);
-            const column2 = items.slice(midPoint);
+            const duration = items.length * 8;
+            const loopedItems = [...items, ...items, ...items]; // Triplicado para preenchimento total e loop suave
             
-            // Função auxiliar para renderizar uma coluna
-            const renderColumn = (columnItems, duration) => {
-                let html = '<div class="flex flex-col gap-6">';
-                
-                // Duplica os itens para criar o efeito de rolagem infinita
-                const loopedItems = [...columnItems, ...columnItems];
-                
-                loopedItems.forEach(item => {
-                    html += `
-                        <div class="testimonial-card bg-slate-800 p-8 rounded-3xl border border-gray-700 shadow-lg shadow-blue-500/10">
-                            <p class="text-gray-300 mb-6">"${item.quote}"</p>
-                            <div class="flex items-center">
-                                <img src="${item.image_url || 'https://placehold.co/40x40/4b5563/ffffff?text=AV'}" 
-                                    alt="${item.name}" 
-                                    class="w-10 h-10 rounded-full mr-3 object-cover"
-                                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/4b5563/ffffff?text=AV';"
-                                >
-                                <div>
-                                    <h4 class="font-medium text-white">${item.name}</h4>
-                                    <p class="text-sm text-gray-400">${item.title}</p>
-                                </div>
+            let html = `<div class="flex gap-8 animate-scroll-horizontal" style="animation-duration: ${duration}s; width: max-content;">`;
+            
+            loopedItems.forEach((item, idx) => {
+                const itemData = JSON.stringify(item).replace(/"/g, '&quot;');
+                html += `
+                    <div onclick="openTestimonialModal(${itemData})" class="testimonial-card group cursor-pointer bg-neutral-900 p-10 rounded-[2.5rem] border border-white/5 shadow-2xl hover:border-blue-500/50 transition-all duration-500 w-[450px] flex-shrink-0">
+                        <div class="flex items-center mb-8">
+                            <img src="${item.image_url || 'https://placehold.co/80x80/1e293b/ffffff?text=User'}" 
+                                class="w-16 h-16 rounded-full object-cover ring-4 ring-blue-500/20 group-hover:ring-blue-500 transition-all duration-500">
+                            <div class="ml-4">
+                                <h4 class="text-xl font-bold text-white">${item.name}</h4>
+                                <p class="text-blue-400 font-medium">${item.title}</p>
                             </div>
                         </div>
-                    `;
-                });
-                html += '</div>';
-                
-                // Container de rolagem
-                return `
-                    <div class="w-full max-w-xs">
-                        <div class="animate-scroll" style="animation-duration: ${duration}s;">
-                            ${html}
+                        <p class="text-gray-300 text-lg leading-relaxed line-clamp-4 italic">"${item.quote}"</p>
+                        <div class="mt-6 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="text-blue-500 font-bold text-sm">Ler depoimento completo <i class="fas fa-expand-alt ml-2"></i></span>
                         </div>
                     </div>
                 `;
-            };
-
-            // Adiciona as colunas ao container
-            container.innerHTML = renderColumn(column1, 15) + renderColumn(column2, 19);
-            container.classList.add('flex', 'justify-center', 'gap-6', 'mask-overflow');
+            });
+            html += '</div>';
+            container.innerHTML = html;
         }
+
+        window.openTestimonialModal = function(data) {
+            const modal = document.getElementById('testimonialModal');
+            const content = document.getElementById('testimonialModalContent');
+            document.getElementById('tm-img').src = data.image_url || 'https://placehold.co/100x100/1e293b/ffffff?text=User';
+            document.getElementById('tm-name').innerText = data.name;
+            document.getElementById('tm-title').innerText = data.title;
+            document.getElementById('tm-quote').innerText = `"${data.quote}"`;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeTestimonialModal = function() {
+            const modal = document.getElementById('testimonialModal');
+            const content = document.getElementById('testimonialModalContent');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = 'auto';
+        };
+
+        window.openServiceModal = function(data) {
+            const modal = document.getElementById('serviceModal');
+            const content = document.getElementById('serviceModalContent');
+            
+            // Exibe a logo da empresa no modal de serviço para reforço de branding visual
+            document.getElementById('sm-image').src = GLOBAL_CONFIG.logo_url || 'https://res.cloudinary.com/dkjc5y76w/image/upload/v1761668741/3_f9cu8v_1_cibmar.png';
+            document.getElementById('sm-image').className = "w-full h-full object-contain p-16 transition-transform duration-[2s] hover:scale-110";
+            
+            document.getElementById('sm-name').innerText = data.name;
+            document.getElementById('sm-subtitle').innerText = data.subtitle || 'Excelência Audiovisual';
+            document.getElementById('sm-description').innerText = data.description || 'Produção de alta performance com equipamentos de última geração, focada em entregar o máximo de impacto visual para sua marca ou evento.';
+            
+            // Ícone no modal
+            const iconContainer = document.getElementById('sm-icon-container');
+            if (data.icon && data.icon.startsWith('http')) {
+                iconContainer.innerHTML = `<img src="${data.icon}" class="w-16 h-16 object-contain">`;
+            } else {
+                iconContainer.innerHTML = `<i class="${data.icon || 'fas fa-video'} text-5xl text-blue-500"></i>`;
+            }
+
+            // CTA do modal
+            document.getElementById('sm-cta').onclick = () => {
+                closeServiceModal();
+                document.getElementById('service').value = data.name;
+                document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+            };
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeServiceModal = function() {
+            const modal = document.getElementById('serviceModal');
+            const content = document.getElementById('serviceModalContent');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = 'auto';
+        };
 
         function renderClients(clientLogos) {
             const marqueeElement = document.getElementById('clientsMarqueeContainer');
@@ -1127,10 +1310,10 @@
                 const logoClass = item.color_style === 'invert' ? 'invert' : (item.color_style === 'grayscale' ? 'grayscale' : '');
                 
                 htmlContent += `
-                    <div class="flex-shrink-0 flex items-center justify-center">
+                    <div class="flex-shrink-0 flex items-center justify-center px-4">
                         <img src="${item.url}" alt="${item.name || 'Logo Cliente'}" 
-                            class="h-8 md:h-11 ${logoClass}" 
-                            onerror="this.onerror=null;this.src='https://placehold.co/120x60/1f2937/ffffff?text=LOGO';"
+                            class="h-12 md:h-20 ${logoClass} object-contain transition-transform duration-500 hover:scale-110" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/200x100/1f2937/ffffff?text=LOGO';"
                         >
                     </div>
                 `;
@@ -1141,8 +1324,8 @@
                 <div class="marquee-wrapper animate-marquee flex items-center whitespace-nowrap gap-16" style="animation-duration: ${duration}s;">
                     ${htmlContent}
                 </div>
-                <div class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-gray-800"></div>
-                <div class="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-gray-800"></div>
+                <div class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-black"></div>
+                <div class="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-black"></div>
             `;
         }
         
@@ -1208,7 +1391,7 @@
         // --- 3. FUNÇÕES DE SUPORTE ---
         
         function formatWhatsapp(number) {
-            // Formata 5519920046344 para (19) 920046344
+            // Formata 5519993252814 para (19) 99325-2814
             const clean = ('' + number).replace(/\D/g, '');
             const match = clean.match(/^(\d{2})(\d{5})(\d{4})$/);
             if (match) {
@@ -1389,6 +1572,15 @@
                     mouseGradient.style.opacity = '0';
                 }
             });
+
+            // Lógica de Scroll para Ativar Wallpaper
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) {
+                    document.body.classList.add('is-scrolled');
+                } else {
+                    document.body.classList.remove('is-scrolled');
+                }
+            });
             
             // Efeito de "ripple" (onda) ao clicar
             document.addEventListener('click', (e) => {
@@ -1427,7 +1619,7 @@
                         (date ? `*Data prevista:* ${date}%0A` : '') +
                         (message ? `*Detalhes:*%0A${message}` : '');
                     
-                    window.open(`https://wa.me/${GLOBAL_CONFIG.whatsapp_number}?text=${whatsappMessage}`, '_blank');
+                    window.open(`https://wa.me/5519920046344?text=${whatsappMessage}`, '_blank');
                     
                     createNotification('success', 'Solicitação enviada!', 'Entraremos em contato em breve.');
                     
@@ -1452,12 +1644,27 @@
             });
 
 
+            // Listener para animações de scroll (Revelar e Ocultar)
+            const observerOptions = { threshold: 0.1 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    } else {
+                        entry.target.classList.remove('active');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
             // Listener para fechar modais com ESC
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.classList.contains('open')) {
-                    closeModal();
-                } else if (e.key === 'Escape' && document.getElementById('scheduleModal').classList.contains('open')) {
-                    closeScheduleModal();
+                if (e.key === 'Escape') {
+                    if (modal.classList.contains('open')) closeModal();
+                    if (document.getElementById('scheduleModal').classList.contains('open')) closeScheduleModal();
+                    if (!document.getElementById('testimonialModal').classList.contains('hidden')) closeTestimonialModal();
+                    if (!document.getElementById('serviceModal').classList.contains('hidden')) closeServiceModal();
                 }
             });
 
